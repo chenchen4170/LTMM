@@ -1,3 +1,3 @@
 export { FileViewerPanel } from './FileViewerPanel'
-export { useFileContent } from './useFileContent'
-export type { FileOutcome } from './useFileContent'
+export { useEditableFile } from './useEditableFile'
+export type { FileOutcome, SaveState } from './useEditableFile'

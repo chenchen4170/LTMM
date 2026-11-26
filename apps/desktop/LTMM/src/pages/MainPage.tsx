@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { AppLayout } from '../components/AppLayout'
 import { FileListPanel, useFileList } from '../features/file-list'
-import { FileViewerPanel, useFileContent } from '../features/file-viewer'
+import { FileViewerPanel, useEditableFile } from '../features/file-viewer'
 import { StatsPanel } from '../features/stats'
 
 /** 主窗口：持有"当前选中的文件"，在文件列表与文件内容区之间共享。 */
@@ -16,8 +16,8 @@ export function MainPage() {
       ? selection.name
       : null
 
-  // 内容只读取一次，同时供中间的内容区和右侧的统计使用
-  const outcome = useFileContent(dir, selectedFile)
+  // 文件内容只在此处读取/编辑一次：中间区域编辑，右侧统计直接使用编辑中的文本，实时更新
+  const { outcome, text, saveState, setText, save } = useEditableFile(dir, selectedFile)
 
   return (
     <AppLayout
@@ -31,11 +31,20 @@ export function MainPage() {
           onSelect={(name) => dir && setSelection({ dir, name })}
         />
       }
-      center={<FileViewerPanel fileName={selectedFile} outcome={outcome} />}
+      center={
+        <FileViewerPanel
+          fileName={selectedFile}
+          outcome={outcome}
+          text={text}
+          saveState={saveState}
+          onChange={setText}
+          onSave={save}
+        />
+      }
       right={
         <StatsPanel
           fileName={selectedFile}
-          content={outcome?.ok ? outcome.content : null}
+          content={outcome?.ok ? text : null}
           unreadable={outcome !== null && !outcome.ok}
         />
       }

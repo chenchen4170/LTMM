@@ -1,5 +1,5 @@
 import { BrowserWindow, dialog, ipcMain } from 'electron';
-import { listFileNames, readTextFile } from './files.js';
+import { listFileNames, readTextFile, writeTextFile } from './files.js';
 import { getSettings, updateSettings } from './settings-store.js';
 
 export function registerIpcHandlers() {
@@ -25,6 +25,17 @@ export function registerIpcHandlers() {
   ipcMain.handle('files:read', (_event, name) =>
     readTextFile(getSettings().workspaceDir, name),
   );
+
+  // 写入工作文件夹中的文件。渲染进程需同时传入它认为的工作文件夹：
+  // 若与当前设置不一致（例如编辑期间用户在设置里切换了文件夹），拒绝写入，
+  // 防止把旧文件夹中文件的内容写进新文件夹里的同名文件。
+  ipcMain.handle('files:write', (_event, dir, name, content) => {
+    const { workspaceDir } = getSettings();
+    if (!workspaceDir || dir !== workspaceDir) {
+      throw new Error('Workspace folder changed');
+    }
+    return writeTextFile(workspaceDir, name, content);
+  });
 
   // 弹出系统文件夹选择框；取消时返回 null
   ipcMain.handle('dialog:select-folder', async (event) => {
