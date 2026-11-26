@@ -1,4 +1,5 @@
 import { BrowserWindow, dialog, ipcMain } from 'electron';
+import { listFileNames, readTextFile } from './files.js';
 import { getSettings, updateSettings } from './settings-store.js';
 
 export function registerIpcHandlers() {
@@ -12,6 +13,18 @@ export function registerIpcHandlers() {
     }
     return settings;
   });
+
+  // 列出已保存的工作文件夹中的文件名。路径只取自设置，不接受渲染进程传入，
+  // 避免页面被利用来读取任意目录。未设置文件夹时返回空列表。
+  ipcMain.handle('files:list', async () => {
+    const { workspaceDir } = getSettings();
+    return workspaceDir ? listFileNames(workspaceDir) : [];
+  });
+
+  // 读取工作文件夹中指定文件的内容；同样只信任设置里的路径，渲染进程只传文件名。
+  ipcMain.handle('files:read', (_event, name) =>
+    readTextFile(getSettings().workspaceDir, name),
+  );
 
   // 弹出系统文件夹选择框；取消时返回 null
   ipcMain.handle('dialog:select-folder', async (event) => {

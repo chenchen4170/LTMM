@@ -5,6 +5,8 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('electronAPI', {
   getSettings: () => ipcRenderer.invoke('settings:get'),
   updateSettings: (patch) => ipcRenderer.invoke('settings:update', patch),
+  listFiles: () => ipcRenderer.invoke('files:list'),
+  readFile: (name) => ipcRenderer.invoke('files:read', name),
   selectFolder: () => ipcRenderer.invoke('dialog:select-folder'),
   /** 订阅设置变化，返回取消订阅函数 */
   onSettingsChanged: (callback) => {

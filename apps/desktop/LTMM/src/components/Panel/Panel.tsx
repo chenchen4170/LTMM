@@ -10,7 +10,11 @@ interface PanelProps {
 export function Panel({ title, children }: PanelProps) {
   return (
     <section className={styles.panel}>
-      <header className={styles.header}>{title}</header>
+      <header className={styles.header}>
+        <span className={styles.title} title={title}>
+          {title}
+        </span>
+      </header>
       <div className={styles.body}>{children}</div>
     </section>
   )

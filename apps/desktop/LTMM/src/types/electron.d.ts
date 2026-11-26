@@ -4,10 +4,19 @@ export interface AppSettings {
   workspaceDir: string | null
 }
 
+/** 读取文件内容的结果；失败原因：超过大小上限 / 二进制文件 / 不是普通文件 */
+export type ReadFileResult =
+  | { ok: true; content: string }
+  | { ok: false; reason: 'too-large' | 'binary' | 'not-a-file' }
+
 /** 与 electron/preload.cjs 暴露的 API 保持一致 */
 export interface ElectronAPI {
   getSettings: () => Promise<AppSettings>
   updateSettings: (patch: Partial<AppSettings>) => Promise<AppSettings>
+  /** 工作文件夹下的文件名（不递归、不含隐藏文件）；未设置文件夹时为空数组 */
+  listFiles: () => Promise<string[]>
+  /** 读取工作文件夹中某个文件的文本内容，只接受文件名而非路径 */
+  readFile: (name: string) => Promise<ReadFileResult>
   /** 弹出系统文件夹选择框；用户取消时返回 null */
   selectFolder: () => Promise<string | null>
   /** 订阅设置变化，返回取消订阅函数 */

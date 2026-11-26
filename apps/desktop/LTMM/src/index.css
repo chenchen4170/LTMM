@@ -2,6 +2,8 @@
   --color-bg: #ffffff;
   --color-bg-sidebar: #f6f7f9;
   --color-border: #e2e4e9;
+  --color-hover: #eceef2;
+  --color-selected: #dcdfe5;
   --color-text: #1f2328;
   --color-text-muted: #6b7280;
 
@@ -17,6 +19,8 @@
     --color-bg: #1b1d21;
     --color-bg-sidebar: #23262b;
     --color-border: #33373d;
+    --color-hover: #2c3036;
+    --color-selected: #3a3f47;
     --color-text: #e6e8eb;
     --color-text-muted: #9097a1;
   }
