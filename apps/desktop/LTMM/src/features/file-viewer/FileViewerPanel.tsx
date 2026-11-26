@@ -1,10 +1,11 @@
 import { Panel } from '../../components/Panel'
-import { useFileContent } from './useFileContent'
+import type { FileOutcome } from './useFileContent'
 import styles from './FileViewerPanel.module.css'
 
 interface FileViewerPanelProps {
-  dir: string | null
   fileName: string | null
+  /** 文件读取结果；加载中为 null */
+  outcome: FileOutcome | null
 }
 
 const FAILURE_MESSAGES = {
@@ -14,14 +15,12 @@ const FAILURE_MESSAGES = {
   error: '无法读取该文件',
 } as const
 
-export function FileViewerPanel({ dir, fileName }: FileViewerPanelProps) {
-  const { outcome, loading } = useFileContent(dir, fileName)
-
+export function FileViewerPanel({ fileName, outcome }: FileViewerPanelProps) {
   return (
     <Panel title={fileName ?? '文件内容'}>
       {!fileName ? (
         <p className="placeholder">选择左侧文件以查看内容</p>
-      ) : loading || !outcome ? null : outcome.ok ? (
+      ) : !outcome ? null : outcome.ok ? (
         outcome.content === '' ? (
           <p className="placeholder">文件内容为空</p>
         ) : (

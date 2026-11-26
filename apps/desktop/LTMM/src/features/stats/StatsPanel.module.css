@@ -1,0 +1,56 @@
+.file {
+  margin: 0 0 12px;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.table th {
+  padding: 0 0 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.table td {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.duration,
+.ratio {
+  text-align: right !important;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.duration {
+  width: 96px;
+}
+
+.ratio {
+  width: 56px;
+}
+
+.category {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-right: 8px;
+}
+
+/* "未记录"行：弱化显示，始终位于表格末尾 */
+.unrecorded td {
+  color: var(--color-text-muted);
+}

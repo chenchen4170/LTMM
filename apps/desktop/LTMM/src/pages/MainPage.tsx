@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { AppLayout } from '../components/AppLayout'
 import { FileListPanel, useFileList } from '../features/file-list'
-import { FileViewerPanel } from '../features/file-viewer'
+import { FileViewerPanel, useFileContent } from '../features/file-viewer'
 import { StatsPanel } from '../features/stats'
 
 /** 主窗口：持有"当前选中的文件"，在文件列表与文件内容区之间共享。 */
@@ -16,6 +16,9 @@ export function MainPage() {
       ? selection.name
       : null
 
+  // 内容只读取一次，同时供中间的内容区和右侧的统计使用
+  const outcome = useFileContent(dir, selectedFile)
+
   return (
     <AppLayout
       left={
@@ -28,8 +31,14 @@ export function MainPage() {
           onSelect={(name) => dir && setSelection({ dir, name })}
         />
       }
-      center={<FileViewerPanel dir={dir} fileName={selectedFile} />}
-      right={<StatsPanel />}
+      center={<FileViewerPanel fileName={selectedFile} outcome={outcome} />}
+      right={
+        <StatsPanel
+          fileName={selectedFile}
+          content={outcome?.ok ? outcome.content : null}
+          unreadable={outcome !== null && !outcome.ok}
+        />
+      }
     />
   )
 }

@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react'
 import type { ReadFileResult } from '../../types/electron'
 
-type Outcome = ReadFileResult | { ok: false; reason: 'error' }
+export type FileOutcome = ReadFileResult | { ok: false; reason: 'error' }
 
 interface Loaded {
   key: string
-  outcome: Outcome
+  outcome: FileOutcome
 }
 
-/** 读取选中文件的文本内容；文件切换或窗口重新获得焦点时刷新。 */
+/** 读取选中文件的文本内容；加载中或未选中文件时返回 null。文件切换或窗口重新获得焦点时刷新。 */
 export function useFileContent(dir: string | null, fileName: string | null) {
   const [loaded, setLoaded] = useState<Loaded | null>(null)
   const [refreshTick, setRefreshTick] = useState(0)
@@ -37,6 +37,5 @@ export function useFileContent(dir: string | null, fileName: string | null) {
   }, [key, fileName, refreshTick])
 
   // 结果对应的不是当前选中文件（刚切换、尚未返回）视为加载中
-  const current = loaded && loaded.key === key ? loaded.outcome : null
-  return { outcome: current, loading: key !== null && current === null }
+  return loaded && loaded.key === key ? loaded.outcome : null
 }
