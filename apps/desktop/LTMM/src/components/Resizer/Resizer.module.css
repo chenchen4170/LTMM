@@ -1,0 +1,24 @@
+.resizer {
+  position: relative;
+  cursor: col-resize;
+  touch-action: none;
+  outline: none;
+}
+
+/* 1px 分隔线，hover / 拖拽 / 聚焦时高亮 */
+.resizer::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 50%;
+  width: 1px;
+  transform: translateX(-50%);
+  background: var(--color-border);
+  transition: background 0.1s, width 0.1s;
+}
+
+.resizer:hover::after,
+.resizer:focus-visible::after,
+.active::after {
+  width: 3px;
+  background: var(--color-accent);
+}

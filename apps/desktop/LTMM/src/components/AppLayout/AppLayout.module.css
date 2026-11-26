@@ -1,0 +1,32 @@
+.root {
+  display: grid;
+  /* 左栏 | 分隔条 | 中间自适应 | 分隔条 | 右栏 */
+  grid-template-columns:
+    var(--left-width) var(--resizer-width) minmax(0, 1fr)
+    var(--resizer-width) var(--right-width);
+  height: 100%;
+}
+
+/* 拖拽期间：统一光标、禁止选中文字 */
+.dragging {
+  cursor: col-resize;
+  user-select: none;
+}
+
+.left,
+.center,
+.right {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.left,
+.right {
+  background: var(--color-bg-sidebar);
+}
+
+.center {
+  background: var(--color-bg);
+}
