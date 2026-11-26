@@ -1,5 +1,8 @@
+import { useEffect, useRef } from 'react'
 import type { KeyboardEvent } from 'react'
 import { Panel } from '../../components/Panel'
+import { appendDoingEntry } from '../../lib/timeLog'
+import { AddEntryButton } from './AddEntryButton'
 import type { FileOutcome, SaveState } from './useEditableFile'
 import styles from './FileViewerPanel.module.css'
 
@@ -10,6 +13,8 @@ interface FileViewerPanelProps {
   /** 编辑器中的文本 */
   text: string
   saveState: SaveState
+  /** 可选的分类（来自设置），点击右下角 + 时供选择 */
+  categories: string[]
   onChange: (text: string) => void
   /** 立即保存（Cmd/Ctrl+S） */
   onSave: () => void
@@ -34,6 +39,7 @@ export function FileViewerPanel({
   outcome,
   text,
   saveState,
+  categories,
   onChange,
   onSave,
 }: FileViewerPanelProps) {
@@ -45,36 +51,60 @@ export function FileViewerPanel({
   }
 
   const editing = fileName !== null && outcome?.ok === true
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  // 追加记录后要选中的范围，等文本更新渲染完成后再应用
+  const pendingSelection = useRef<[number, number] | null>(null)
+
+  const handleAddEntry = (category: string) => {
+    const entry = appendDoingEntry(text, category, new Date())
+    pendingSelection.current = [entry.selectStart, entry.selectEnd]
+    onChange(entry.text)
+  }
+
+  // 新增记录后：聚焦文本框、滚动到末尾，并选中 doing，方便直接输入结束时间
+  useEffect(() => {
+    const range = pendingSelection.current
+    const el = textareaRef.current
+    if (!range || !el) return
+    pendingSelection.current = null
+    el.focus()
+    el.setSelectionRange(range[0], range[1])
+    el.scrollTop = el.scrollHeight
+  }, [text])
 
   return (
-    <Panel
-      title={fileName ?? '文件内容'}
-      bodyClassName={editing ? styles.editorBody : undefined}
-      extra={
-        editing && (
-          <span
-            className={`${styles.status} ${saveState === 'error' ? styles.statusError : ''}`}
-            role="status"
-          >
-            {SAVE_LABELS[saveState]}
-          </span>
-        )
-      }
-    >
-      {!fileName ? (
-        <p className="placeholder">选择左侧文件以查看内容</p>
-      ) : !outcome ? null : outcome.ok ? (
-        <textarea
-          className={styles.editor}
-          value={text}
-          onChange={(e) => onChange(e.target.value)}
-          onKeyDown={handleKeyDown}
-          spellCheck={false}
-          aria-label={`编辑 ${fileName}`}
-        />
-      ) : (
-        <p className="placeholder">{FAILURE_MESSAGES[outcome.reason]}</p>
-      )}
-    </Panel>
+    <div className={styles.root}>
+      <Panel
+        title={fileName ?? '文件内容'}
+        bodyClassName={editing ? styles.editorBody : undefined}
+        extra={
+          editing && (
+            <span
+              className={`${styles.status} ${saveState === 'error' ? styles.statusError : ''}`}
+              role="status"
+            >
+              {SAVE_LABELS[saveState]}
+            </span>
+          )
+        }
+      >
+        {!fileName ? (
+          <p className="placeholder">选择左侧文件以查看内容</p>
+        ) : !outcome ? null : outcome.ok ? (
+          <textarea
+            ref={textareaRef}
+            className={styles.editor}
+            value={text}
+            onChange={(e) => onChange(e.target.value)}
+            onKeyDown={handleKeyDown}
+            spellCheck={false}
+            aria-label={`编辑 ${fileName}`}
+          />
+        ) : (
+          <p className="placeholder">{FAILURE_MESSAGES[outcome.reason]}</p>
+        )}
+      </Panel>
+      {editing && <AddEntryButton categories={categories} onSelect={handleAddEntry} />}
+    </div>
   )
 }

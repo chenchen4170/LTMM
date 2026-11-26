@@ -37,7 +37,9 @@ export function openSettingsWindow() {
 
   settingsWindow = new BrowserWindow({
     width: 560,
-    height: 380,
+    height: 600,
+    minWidth: 420,
+    minHeight: 420,
     title: 'Settings',
     minimizable: false,
     fullscreenable: false,

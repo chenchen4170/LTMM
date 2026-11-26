@@ -5,7 +5,7 @@ import {
   formatDuration,
   formatPercent,
   parseTimeLog,
-} from './timeLog'
+} from '../../lib/timeLog'
 import styles from './StatsPanel.module.css'
 
 interface StatsPanelProps {

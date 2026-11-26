@@ -96,3 +96,32 @@ export function formatDuration(minutes: number): string {
 }
 
 export const formatPercent = (ratio: number) => `${(ratio * 100).toFixed(1)}%`
+
+/** 进行中的记录用它代替结束时间，等用户补全真实的结束时间后才会计入统计 */
+export const DOING_PLACEHOLDER = 'doing'
+
+const pad2 = (n: number) => String(n).padStart(2, '0')
+
+/** 24 小时制 HH:mm */
+export const formatClock = (date: Date) => `${pad2(date.getHours())}:${pad2(date.getMinutes())}`
+
+/** 新记录行："- [ ] 15:38 - doing 管理"（结束时间尚未确定，不符合统计格式，因此暂不计入统计） */
+export function buildDoingLine(category: string, now: Date): string {
+  return `- [ ] ${formatClock(now)} - ${DOING_PLACEHOLDER} ${category}`
+}
+
+/**
+ * 在文本末尾追加一条"进行中"的记录，保证它独占一行，并以换行结尾。
+ * 同时返回占位符 doing 所在的范围，便于界面选中它让用户直接输入结束时间。
+ */
+export function appendDoingEntry(text: string, category: string, now: Date) {
+  const line = buildDoingLine(category, now)
+  const separator = text === '' || text.endsWith('\n') ? '' : '\n'
+  const lineStart = text.length + separator.length
+  const selectStart = lineStart + line.indexOf(DOING_PLACEHOLDER)
+  return {
+    text: `${text}${separator}${line}\n`,
+    selectStart,
+    selectEnd: selectStart + DOING_PLACEHOLDER.length,
+  }
+}

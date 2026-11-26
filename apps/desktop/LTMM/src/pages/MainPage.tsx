@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { AppLayout } from '../components/AppLayout'
 import { FileListPanel, useFileList } from '../features/file-list'
 import { FileViewerPanel, useEditableFile } from '../features/file-viewer'
+import { useSettings } from '../features/settings'
 import { StatsPanel } from '../features/stats'
 
 /** 主窗口：持有"当前选中的文件"，在文件列表与文件内容区之间共享。 */
@@ -17,6 +18,7 @@ export function MainPage() {
       : null
 
   // 文件内容只在此处读取/编辑一次：中间区域编辑，右侧统计直接使用编辑中的文本，实时更新
+  const { settings } = useSettings()
   const { outcome, text, saveState, setText, save } = useEditableFile(dir, selectedFile)
 
   return (
@@ -37,6 +39,7 @@ export function MainPage() {
           outcome={outcome}
           text={text}
           saveState={saveState}
+          categories={settings?.categories ?? []}
           onChange={setText}
           onSave={save}
         />

@@ -1,3 +1,4 @@
+import { CategoryManager } from './CategoryManager'
 import { useSettings } from './useSettings'
 import styles from './SettingsPage.module.css'
 
@@ -45,6 +46,18 @@ export function SettingsPage() {
             清除
           </button>
         </div>
+      </div>
+
+      <div className={`${styles.field} ${styles.section}`}>
+        <span className={styles.label}>分类管理</span>
+        <p className={styles.hint}>
+          在主页面点击右下角的 + 添加记录时，可从这些分类中选择。分类名不能包含空格；
+          修改或删除分类不会改动已有的记录文件。
+        </p>
+        <CategoryManager
+          categories={settings?.categories ?? []}
+          onChange={(categories) => update({ categories })}
+        />
       </div>
     </div>
   )

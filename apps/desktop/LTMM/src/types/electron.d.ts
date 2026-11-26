@@ -2,6 +2,8 @@
 export interface AppSettings {
   /** 用户选择的本地工作文件夹，未选择时为 null */
   workspaceDir: string | null
+  /** 用户维护的分类列表；名称不含空白字符且不重复 */
+  categories: string[]
 }
 
 /** 读取文件内容的结果；失败原因：超过大小上限 / 二进制文件 / 不是普通文件 */

@@ -1,3 +1,12 @@
+/* 浮动的添加按钮相对它定位 */
+.root {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
 /* 编辑模式：文本框撑满内容区，滚动由文本框自己负责 */
 .editorBody {
   display: flex;
@@ -11,7 +20,8 @@
   width: 100%;
   min-height: 0;
   margin: 0;
-  padding: 16px;
+  /* 底部留白：让最后几行可以滚动到浮动按钮之上 */
+  padding: 16px 16px 88px;
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 13px;
   line-height: 1.6;
