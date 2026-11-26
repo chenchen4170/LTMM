@@ -69,3 +69,28 @@ export async function writeTextFile(dir, name, content) {
     throw err;
   }
 }
+
+/** 单次批量读取的文件数上限（一个月最多 31 天，留出同一天有多个文件的余量） */
+const MAX_BATCH_FILES = 100;
+
+/**
+ * 批量读取工作文件夹中多个文件的文本内容，用于按周/月汇总统计。
+ * 返回 { 文件名: 内容 }；不存在、二进制、过大或读取失败的文件会被跳过。
+ */
+export async function readTextFiles(dir, names) {
+  if (!Array.isArray(names) || names.length > MAX_BATCH_FILES) {
+    throw new TypeError('names must be an array of at most 100 file names');
+  }
+  const result = {};
+  await Promise.all(
+    names.map(async (name) => {
+      try {
+        const file = await readTextFile(dir, name);
+        if (file.ok) result[name] = file.content;
+      } catch {
+        // 单个文件读取失败不影响其他文件
+      }
+    }),
+  );
+  return result;
+}

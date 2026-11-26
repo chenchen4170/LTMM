@@ -1,0 +1,7 @@
+/* 时间线标签页：内容区自己负责滚动，不要内边距 */
+.flush {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+}

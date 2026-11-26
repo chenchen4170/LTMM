@@ -19,6 +19,8 @@ export interface ElectronAPI {
   listFiles: () => Promise<string[]>
   /** 读取工作文件夹中某个文件的文本内容，只接受文件名而非路径 */
   readFile: (name: string) => Promise<ReadFileResult>
+  /** 批量读取多个文件的文本内容，返回 { 文件名: 内容 }；无法读取的文件会被跳过 */
+  readFiles: (names: string[]) => Promise<Record<string, string>>
   /** 覆盖写入已存在的文件；dir 必须等于当前工作文件夹，否则拒绝 */
   writeFile: (dir: string, name: string, content: string) => Promise<void>
   /** 弹出系统文件夹选择框；用户取消时返回 null */

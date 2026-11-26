@@ -89,7 +89,7 @@ export function AppLayout({ left, center, right }: AppLayoutProps) {
         onChange={setRightWidth}
         onDragChange={setDragging}
       />
-      <aside className={styles.right} aria-label="统计汇总">
+      <aside className={styles.right} aria-label="统计与时间线">
         {right}
       </aside>
     </div>

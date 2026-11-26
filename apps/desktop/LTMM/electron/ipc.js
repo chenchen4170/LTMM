@@ -1,5 +1,5 @@
 import { BrowserWindow, dialog, ipcMain } from 'electron';
-import { listFileNames, readTextFile, writeTextFile } from './files.js';
+import { listFileNames, readTextFile, readTextFiles, writeTextFile } from './files.js';
 import { getSettings, updateSettings } from './settings-store.js';
 
 export function registerIpcHandlers() {
@@ -24,6 +24,11 @@ export function registerIpcHandlers() {
   // 读取工作文件夹中指定文件的内容；同样只信任设置里的路径，渲染进程只传文件名。
   ipcMain.handle('files:read', (_event, name) =>
     readTextFile(getSettings().workspaceDir, name),
+  );
+
+  // 批量读取多个文件的内容（周/月统计用），同样只接受文件名。
+  ipcMain.handle('files:read-many', (_event, names) =>
+    readTextFiles(getSettings().workspaceDir, names),
   );
 
   // 写入工作文件夹中的文件。渲染进程需同时传入它认为的工作文件夹：

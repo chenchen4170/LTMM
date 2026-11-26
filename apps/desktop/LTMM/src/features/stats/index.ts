@@ -1,1 +1,1 @@
-export { StatsPanel } from './StatsPanel'
+export { StatsView } from './StatsView'

@@ -1,0 +1,80 @@
+.scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.message {
+  padding: 16px;
+}
+
+/* 24 小时的时间轴，高度 = 24 × 每小时高度（由内联样式给出） */
+.grid {
+  position: relative;
+  margin: 12px 12px 12px 0;
+}
+
+.hour {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.hourLabel {
+  position: absolute;
+  top: -8px;
+  left: 0;
+  width: 48px;
+  padding-right: 8px;
+  font-size: 11px;
+  text-align: right;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+  /* 标签盖在分隔线上，用侧栏背景色遮住线 */
+  background: var(--color-bg-sidebar);
+}
+
+.hour:first-child .hourLabel {
+  top: 0;
+}
+
+.events {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 52px;
+  right: 0;
+}
+
+.block {
+  position: absolute;
+  overflow: hidden;
+  padding: 2px 6px;
+  font-size: 12px;
+  line-height: 1.35;
+  border-left: 3px solid hsl(var(--hue) 65% 50%);
+  border-radius: 4px;
+  background: hsl(var(--hue) 70% 55% / 0.22);
+}
+
+.block.inProgress {
+  border: 1px dashed hsl(var(--hue) 65% 50%);
+  border-left-width: 3px;
+  background: hsl(var(--hue) 70% 55% / 0.08);
+}
+
+.line {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.category {
+  font-weight: 600;
+}
+
+.time {
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}

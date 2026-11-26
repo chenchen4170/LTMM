@@ -7,6 +7,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   updateSettings: (patch) => ipcRenderer.invoke('settings:update', patch),
   listFiles: () => ipcRenderer.invoke('files:list'),
   readFile: (name) => ipcRenderer.invoke('files:read', name),
+  readFiles: (names) => ipcRenderer.invoke('files:read-many', names),
   writeFile: (dir, name, content) => ipcRenderer.invoke('files:write', dir, name, content),
   selectFolder: () => ipcRenderer.invoke('dialog:select-folder'),
   /** 订阅设置变化，返回取消订阅函数 */

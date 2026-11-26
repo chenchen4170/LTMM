@@ -3,7 +3,7 @@ import { AppLayout } from '../components/AppLayout'
 import { FileListPanel, useFileList } from '../features/file-list'
 import { FileViewerPanel, useEditableFile } from '../features/file-viewer'
 import { useSettings } from '../features/settings'
-import { StatsPanel } from '../features/stats'
+import { InsightsPanel } from '../features/insights'
 
 /** 主窗口：持有"当前选中的文件"，在文件列表与文件内容区之间共享。 */
 export function MainPage() {
@@ -45,7 +45,9 @@ export function MainPage() {
         />
       }
       right={
-        <StatsPanel
+        <InsightsPanel
+          dir={dir}
+          files={files}
           fileName={selectedFile}
           content={outcome?.ok ? text : null}
           unreadable={outcome !== null && !outcome.ok}

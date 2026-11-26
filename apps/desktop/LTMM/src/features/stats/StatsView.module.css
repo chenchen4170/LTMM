@@ -1,10 +1,10 @@
 .file {
-  margin: 0 0 12px;
+  margin: 12px 0;
   font-size: 12px;
+  line-height: 1.5;
   color: var(--color-text-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  /* 周/月的汇总文字较长，允许换行而不是截断（已记录时长是关键信息） */
+  overflow-wrap: anywhere;
 }
 
 .table {
@@ -44,10 +44,31 @@
 }
 
 .category {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding-right: 8px;
+}
+
+.categoryName {
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  padding-right: 8px;
+}
+
+/* 分类色点：颜色与时间线中同一分类的色块一致；"未记录"行为灰色 */
+.dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: hsl(var(--hue, 0) 65% 55%);
+}
+
+.unrecorded .dot {
+  background: var(--color-border);
 }
 
 /* "未记录"行：弱化显示，始终位于表格末尾 */

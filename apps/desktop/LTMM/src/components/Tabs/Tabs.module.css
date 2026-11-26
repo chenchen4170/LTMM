@@ -1,0 +1,59 @@
+.tab {
+  font: inherit;
+  color: var(--color-text-muted);
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.tab:hover {
+  color: var(--color-text);
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
+}
+
+.selected {
+  color: var(--color-text);
+}
+
+/* ---- 标题栏里的下划线标签：撑满标题栏高度，选中项的下划线盖在标题栏的分隔线上 ---- */
+.underline {
+  display: flex;
+  align-self: stretch;
+  gap: 10px;
+}
+
+.underline .tab {
+  padding: 0 4px;
+  font-size: 13px;
+  font-weight: 600;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+
+.underline .selected {
+  border-bottom-color: var(--color-accent);
+}
+
+/* ---- 分段控件 ---- */
+.segmented {
+  display: flex;
+  padding: 2px;
+  border-radius: 8px;
+  background: var(--color-border);
+}
+
+.segmented .tab {
+  flex: 1;
+  padding: 4px 0;
+  font-size: 12px;
+  border-radius: 6px;
+}
+
+.segmented .selected {
+  background: var(--color-bg);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.12);
+}

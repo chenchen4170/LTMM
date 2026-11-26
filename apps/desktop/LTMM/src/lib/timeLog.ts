@@ -15,13 +15,13 @@ export interface TimeEntry {
 export interface StatRow {
   category: string
   minutes: number
-  /** 占一天（24 小时）的比例，0~1 */
+  /** 占统计周期总时长的比例，0~1 */
   ratio: number
   /** 是否为"未记录"行 */
   unrecorded: boolean
 }
 
-export interface DayStats {
+export interface PeriodStats {
   rows: StatRow[]
   recordedMinutes: number
 }
@@ -32,6 +32,7 @@ const LINE =
   /^\s*[-*+]\s+\[[ xX]\]\s+(\d{1,2}):(\d{2})\s*[-–—~]\s*(\d{1,2}):(\d{2})\s+(\S+)(?:\s+(.*?))?\s*$/
 
 const toMinutes = (h: string, m: string) => Number(h) * 60 + Number(m)
+const isValidClock = (h: string, m: string) => Number(h) <= 24 && Number(m) <= 59
 
 /** 解析记录文本，不符合格式的行（标题、空行、备注等）会被忽略。 */
 export function parseTimeLog(text: string): TimeEntry[] {
@@ -40,7 +41,7 @@ export function parseTimeLog(text: string): TimeEntry[] {
     const match = LINE.exec(line)
     if (!match) continue
     const [, sh, sm, eh, em, category, description = ''] = match
-    if (Number(sh) > 24 || Number(eh) > 24 || Number(sm) > 59 || Number(em) > 59) continue
+    if (!isValidClock(sh, sm) || !isValidClock(eh, em)) continue
 
     const start = toMinutes(sh, sm)
     let end = toMinutes(eh, em)
@@ -52,9 +53,10 @@ export function parseTimeLog(text: string): TimeEntry[] {
 
 /**
  * 按分类汇总时长，按时长降序排列（时长相同保持出现顺序），
- * 最后追加"未记录"行（一天 24 小时减去已记录时长，为 0 时不显示）。
+ * 最后追加"未记录"行（days 天的总时长减去已记录时长，为 0 时不显示）。
+ * @param days 统计周期包含的天数：日=1，周/月为实际计入的天数
  */
-export function computeDayStats(entries: TimeEntry[]): DayStats {
+export function computeStats(entries: TimeEntry[], days = 1): PeriodStats {
   const byCategory = new Map<string, number>()
   for (const { start, end, category } of entries) {
     const minutes = end - start
@@ -62,8 +64,9 @@ export function computeDayStats(entries: TimeEntry[]): DayStats {
   }
 
   const recordedMinutes = [...byCategory.values()].reduce((a, b) => a + b, 0)
-  // 记录总时长超过 24 小时（时间重叠等）时，以记录总时长为分母，保证占比不超过 100%
-  const denominator = Math.max(MINUTES_PER_DAY, recordedMinutes)
+  const totalMinutes = days * MINUTES_PER_DAY
+  // 记录总时长超过周期总时长（时间重叠等）时，以记录总时长为分母，保证占比不超过 100%
+  const denominator = Math.max(totalMinutes, recordedMinutes)
 
   const rows: StatRow[] = [...byCategory]
     .sort((a, b) => b[1] - a[1])
@@ -74,7 +77,7 @@ export function computeDayStats(entries: TimeEntry[]): DayStats {
       unrecorded: false,
     }))
 
-  const unrecordedMinutes = MINUTES_PER_DAY - recordedMinutes
+  const unrecordedMinutes = totalMinutes - recordedMinutes
   if (unrecordedMinutes > 0) {
     rows.push({
       category: UNRECORDED_LABEL,
@@ -102,6 +105,10 @@ export const DOING_PLACEHOLDER = 'doing'
 
 const pad2 = (n: number) => String(n).padStart(2, '0')
 
+/** 自 00:00 起的分钟数 → HH:mm（1440 显示为 24:00） */
+export const formatMinuteOfDay = (minutes: number) =>
+  `${pad2(Math.floor(minutes / 60))}:${pad2(minutes % 60)}`
+
 /** 24 小时制 HH:mm */
 export const formatClock = (date: Date) => `${pad2(date.getHours())}:${pad2(date.getMinutes())}`
 
@@ -124,4 +131,30 @@ export function appendDoingEntry(text: string, category: string, now: Date) {
     selectStart,
     selectEnd: selectStart + DOING_PLACEHOLDER.length,
   }
+}
+
+/** 进行中的记录（结束时间为 doing）：只有开始时间，尚未结束 */
+export interface InProgressEntry {
+  start: number
+  category: string
+  description: string
+}
+
+const DOING_LINE = new RegExp(
+  `^\\s*[-*+]\\s+\\[[ xX]\\]\\s+(\\d{1,2}):(\\d{2})\\s*[-–—~]\\s*${DOING_PLACEHOLDER}\\s+(\\S+)(?:\\s+(.*?))?\\s*$`,
+)
+
+/** 解析"进行中"的记录行，如 "- [ ] 15:38 - doing 管理"。这些行不计入统计。 */
+export function parseInProgressEntries(text: string): InProgressEntry[] {
+  const entries: InProgressEntry[] = []
+  for (const line of text.split(/\r?\n/)) {
+    const match = DOING_LINE.exec(line)
+    if (!match || !isValidClock(match[1], match[2])) continue
+    entries.push({
+      start: toMinutes(match[1], match[2]),
+      category: match[3],
+      description: match[4] ?? '',
+    })
+  }
+  return entries
 }
