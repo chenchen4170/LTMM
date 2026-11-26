@@ -34,6 +34,9 @@ const LINE =
 const toMinutes = (h: string, m: string) => Number(h) * 60 + Number(m)
 const isValidClock = (h: string, m: string) => Number(h) <= 24 && Number(m) <= 59
 
+/** 兼容历史手写数据："#管理" 与 "管理" 视为同一分类。只有 "#" 时保留原样，避免分类名为空。 */
+const normalizeCategory = (category: string) => category.replace(/^#+/, '') || category
+
 /** 解析记录文本，不符合格式的行（标题、空行、备注等）会被忽略。 */
 export function parseTimeLog(text: string): TimeEntry[] {
   const entries: TimeEntry[] = []
@@ -46,7 +49,7 @@ export function parseTimeLog(text: string): TimeEntry[] {
     const start = toMinutes(sh, sm)
     let end = toMinutes(eh, em)
     if (end < start) end += MINUTES_PER_DAY // 结束时间早于开始时间：视为跨午夜
-    entries.push({ start, end, category, description })
+    entries.push({ start, end, category: normalizeCategory(category), description })
   }
   return entries
 }
@@ -152,7 +155,7 @@ export function parseInProgressEntries(text: string): InProgressEntry[] {
     if (!match || !isValidClock(match[1], match[2])) continue
     entries.push({
       start: toMinutes(match[1], match[2]),
-      category: match[3],
+      category: normalizeCategory(match[3]),
       description: match[4] ?? '',
     })
   }
